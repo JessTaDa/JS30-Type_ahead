@@ -8,25 +8,29 @@
 <body>
 
   <form class="search-form">
-    <input type="text" class="search" placeholder="City or State">
+    <input type="text" class="search" placeholder="Element and Discoverer">
     <ul class="suggestions">
-      <li>Filter for a city</li>
-      <li>or a state</li>
+      <li>Filter for an name</li>
+      <li>or a discoverer</li>
     </ul>
   </form>
 <script>
-const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+// const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+const endpoint = 'https://raw.githubusercontent.com/dariusk/corpora/master/data/science/elements.json';
 
-const cities = [];
+const elements = [];
 
 fetch(endpoint)
   .then(blob => blob.json())
-  .then(data => cities.push(...data))
+  // .then(function(blob) {
+  //   return blob.json();
+  // })
+  .then(data => elements.push(...data["elements"]))
 
-function findMatches(wordToMatch, cities) {
-  return cities.filter(place => {
+function findMatches(wordToMatch, elements) {
+  return elements.filter(place => {
     const regex = new RegExp(wordToMatch, 'gi');
-    return place.city.match(regex) || place.state.match(regex)
+    return place.name.match(regex) || place.discoverer.match(regex)
   });
 }
 
@@ -35,18 +39,18 @@ function numberWithCommas(x) {
 }
 
 function displayMatches() {
-  const matchArray = findMatches(this.value, cities);
-  // console.log(matchArray)
+  const matchArray = findMatches(this.value, elements);
+  console.log(matchArray)
   const html = matchArray.map(place => {
 
   const regex = new RegExp(this.value, 'gi');
-  const cityName = place.city.replace(regex, `<span class="hl">${this.value}</span>`);
-  const stateName = place.state.replace(regex, `<span class="hl">${this.value}</span>`);
+  const elementName = place.name.replace(regex, `<span class="hl">${this.value}</span>`);
+  const discovererName = place.discoverer.replace(regex, `<span class="hl">${this.value}</span>`);
 
     return`
     <li>
-      <span class="name">${cityName}, ${stateName}</span>
-      <span class="population">${numberWithCommas(place.population)}</span>
+      <span class="name">${elementName}, ${discovererName}</span>
+      <span class="year_of_discovery">${place.year_of_discovery}</span>
     </li>
     `}).join(''); //joins the suggestion cards together
   suggestions.innerHTML = html;
